@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 import App from './App'
 
 describe('App', () => {
-  it('renders the starter heading', () => {
+  it('renders the not found page for an unmatched location', () => {
     render(<App />)
 
-    expect(screen.getByRole('heading', { name: 'Get started' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Page Not Found' })).toBeInTheDocument()
   })
 })
