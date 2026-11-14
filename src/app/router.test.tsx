@@ -1,10 +1,13 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { appRoutes } from './router'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.unstubAllEnvs()
+})
 
 const routes = [
   ['/login', 'Login'],
@@ -68,5 +71,60 @@ describe('application routes', () => {
     renderRoute('/unknown/path')
 
     expect(screen.getByRole('heading', { name: 'Page Not Found' })).toBeInTheDocument()
+  })
+
+  it('shows the error preview route in development', async () => {
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/error-preview'] })
+    render(<RouterProvider router={router} />)
+    expect(screen.getByRole('heading', { name: 'Permintaan tidak valid' })).toBeInTheDocument()
+
+    expect(await screen.findByRole('heading', { name: 'Pratinjau error aplikasi' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Unknown Error/ })).toBeInTheDocument()
+  })
+
+  it('switches between all preview errors without navigating or reloading', async () => {
+    const user = userEvent.setup()
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/error-preview'] })
+    render(<RouterProvider router={router} />)
+
+    const examples = [
+      ['Unauthorized', 'Sesi Anda telah berakhir'],
+      ['Forbidden', 'Akses ditolak'],
+      ['Not Found', 'Proyek tidak ditemukan'],
+      ['Conflict', 'Draft penawaran sudah tersedia'],
+      ['Validation Error', 'Periksa kembali isian Anda'],
+      ['Internal Server Error', 'Terjadi kesalahan di server'],
+      ['Network Error', 'Tidak dapat terhubung ke server'],
+      ['Unknown Error', 'Terjadi kesalahan'],
+    ] as const
+
+    for (const [buttonName, heading] of examples) {
+      await user.click(screen.getByRole('button', { name: new RegExp(buttonName) }))
+      expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
+      expect(router.state.location.pathname).toBe('/dev/error-preview')
+    }
+  })
+
+  it('does not register the error preview route in production', async () => {
+    vi.stubEnv('DEV', false)
+    vi.resetModules()
+    const { appRoutes: productionRoutes } = await import('./router')
+
+    expect(productionRoutes.some((route) => route.path === '/dev/error-preview')).toBe(false)
+
+    const router = createMemoryRouter(productionRoutes, { initialEntries: ['/dev/error-preview'] })
+    render(<RouterProvider router={router} />)
+    expect(screen.getByRole('heading', { name: 'Page Not Found' })).toBeInTheDocument()
+  })
+
+  it('runs a retry action from the preview without leaving the page', async () => {
+    const user = userEvent.setup()
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/error-preview'] })
+    render(<RouterProvider router={router} />)
+    await user.click(screen.getByRole('button', { name: /Internal Server Error/ }))
+    await user.click(screen.getByRole('button', { name: 'Coba lagi' }))
+
+    expect(screen.getByText('Percobaan ulang: 1')).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/dev/error-preview')
   })
 })

@@ -1,6 +1,7 @@
 import { createBrowserRouter, type RouteObject } from 'react-router'
 import ApplicationLayout from './ApplicationLayout'
 import RoutePlaceholderPage, { NotFoundPage } from '../pages/RoutePlaceholderPage'
+import ErrorPreviewPage from '../pages/ErrorPreviewPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <RoutePlaceholderPage title="Login" /> },
@@ -69,8 +70,15 @@ export const appRoutes: RouteObject[] = [
       { path: 'settings', element: <RoutePlaceholderPage title="Settings" /> },
     ],
   },
+]
+
+if (import.meta.env.DEV) {
+  appRoutes.push({ path: '/dev/error-preview', element: <ErrorPreviewPage /> })
+}
+
+appRoutes.push(
   { path: '/404', element: <NotFoundPage /> },
   { path: '*', element: <NotFoundPage /> },
-]
+)
 
 export const appRouter = createBrowserRouter(appRoutes)
