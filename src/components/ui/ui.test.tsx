@@ -29,7 +29,8 @@ describe('reusable UI components', () => {
   it('renders date, checkbox, radio, and switch controls accessibly', async () => {
     const user = userEvent.setup(); const onRadio = vi.fn()
     render(<><DatePicker aria-label="Tanggal" defaultValue="2026-11-15" /><Checkbox aria-label="Syarat" defaultChecked /><Radio name="billing" value="monthly" onChange={onRadio} options={[{ value: 'monthly', label: 'Bulanan' }, { value: 'annual', label: 'Tahunan' }]} /><Switch aria-label="Notifikasi" /></>)
-    expect(screen.getByLabelText('Tanggal')).toHaveValue('2026-11-15'); expect(screen.getByLabelText('Syarat')).toBeChecked(); await user.click(screen.getByLabelText('Tahunan')); expect(onRadio).toHaveBeenCalledWith('annual'); await user.click(screen.getByRole('switch', { name: 'Notifikasi' })); expect(screen.getByRole('switch', { name: 'Notifikasi' })).toBeChecked()
+    const date = screen.getByLabelText('Tanggal'); expect(date).toHaveValue('2026-11-15'); fireEvent.change(date, { target: { value: '2026-12-01' } }); expect(date).toHaveValue('2026-12-01')
+    const terms = screen.getByLabelText('Syarat'); expect(terms).toBeChecked(); await user.click(terms); expect(terms).not.toBeChecked(); await user.click(screen.getByLabelText('Tahunan')); expect(onRadio).toHaveBeenCalledWith('annual'); await user.click(screen.getByRole('switch', { name: 'Notifikasi' })); expect(screen.getByRole('switch', { name: 'Notifikasi' })).toBeChecked()
   })
 
   it('associates FormField labels, hints, and errors; FormSection renders its content', () => {
