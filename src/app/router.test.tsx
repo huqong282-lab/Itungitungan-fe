@@ -82,6 +82,13 @@ describe('application routes', () => {
     expect(screen.getByRole('button', { name: /Unknown Error/ })).toBeInTheDocument()
   })
 
+  it('loads the component showcase route in development', async () => {
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/components'] })
+    render(<RouterProvider router={router} />)
+    expect(await screen.findByRole('heading', { name: 'Itungitungan UI Component Showcase' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Button', level: 3 })).toBeInTheDocument()
+  })
+
   it('switches between all preview errors without navigating or reloading', async () => {
     const user = userEvent.setup()
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/error-preview'] })
@@ -111,6 +118,7 @@ describe('application routes', () => {
     const { appRoutes: productionRoutes } = await import('./router')
 
     expect(productionRoutes.some((route) => route.path === '/dev/error-preview')).toBe(false)
+    expect(productionRoutes.some((route) => route.path === '/dev/components')).toBe(false)
 
     const router = createMemoryRouter(productionRoutes, { initialEntries: ['/dev/error-preview'] })
     render(<RouterProvider router={router} />)

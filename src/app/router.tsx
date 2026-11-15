@@ -74,6 +74,7 @@ export const appRoutes: RouteObject[] = [
 
 if (import.meta.env.DEV) {
   appRoutes.push({ path: '/dev/error-preview', element: <ErrorPreviewPage /> })
+  appRoutes.push({ path: '/dev/components', lazy: async () => { const module = await import('../pages/ComponentShowcasePage'); return { Component: module.default } } })
 }
 
 appRoutes.push(
