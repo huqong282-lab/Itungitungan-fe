@@ -12,7 +12,7 @@ function AppShellPreviewPage() {
   const activeContent = appNavigation.find((item) => item.to === pathname)?.label ?? 'Dashboard'
 
   return (
-    <AppShell user={previewUser} collapsed={collapsed} onCollapsedChange={setCollapsed}>
+    <AppShell user={previewUser} collapsed={collapsed} onCollapsedChange={setCollapsed} activePathOverride={pathname === '/dev/app-shell' ? '/app' : undefined}>
       <div className="app-shell-preview">
         <header className="app-shell-preview__heading">
           <h1>Preview App Shell</h1>

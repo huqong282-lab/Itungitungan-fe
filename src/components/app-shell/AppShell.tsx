@@ -13,17 +13,19 @@ type AppShellProps = {
   initialCollapsed?: boolean
   collapsed?: boolean
   onCollapsedChange?: (collapsed: boolean) => void
+  activePathOverride?: string
 }
-export function AppShell({ children, user, initialCollapsed = false, collapsed: controlledCollapsed, onCollapsedChange }: AppShellProps) {
+export function AppShell({ children, user, initialCollapsed = false, collapsed: controlledCollapsed, onCollapsedChange, activePathOverride }: AppShellProps) {
   const [internalCollapsed, setInternalCollapsed] = useState(initialCollapsed)
   const collapsed = controlledCollapsed ?? internalCollapsed
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
+  const activePath = activePathOverride ?? location.pathname
   const activeItem = [...appNavigation]
     .sort((a, b) => b.to.length - a.to.length)
     .find((item) => item.to === '/app'
-      ? location.pathname === item.to
-      : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`))
+      ? activePath === item.to
+      : activePath === item.to || activePath.startsWith(`${item.to}/`))
 
   const closeMobile = () => setMobileOpen(false)
   const toggleSidebar = () => {
@@ -36,8 +38,7 @@ export function AppShell({ children, user, initialCollapsed = false, collapsed: 
     <div className={`app-shell${collapsed ? ' app-shell--collapsed' : ''}`}>
       {mobileOpen && <button type="button" className="app-shell__scrim" aria-label="Tutup navigasi" onClick={closeMobile} />}
       <Sidebar
-        activePath={location.pathname}
-        collapsed={collapsed}
+        activePath={activePath}
         mobileOpen={mobileOpen}
         onNavigate={closeMobile}
       />

@@ -3,12 +3,11 @@ import { appNavigation } from './navigation'
 
 type SidebarProps = {
   activePath: string
-  collapsed: boolean
   mobileOpen: boolean
   onNavigate: () => void
 }
 
-export function Sidebar({ activePath, collapsed, mobileOpen, onNavigate }: SidebarProps) {
+export function Sidebar({ activePath, mobileOpen, onNavigate }: SidebarProps) {
   return (
     <aside className={`app-sidebar${mobileOpen ? ' app-sidebar--mobile-open' : ''}`} aria-label="Navigasi aplikasi">
       <Link className="app-sidebar__brand" to="/app" onClick={onNavigate} aria-label="Itungitungan, Dashboard">
@@ -28,7 +27,7 @@ export function Sidebar({ activePath, collapsed, mobileOpen, onNavigate }: Sideb
               onClick={onNavigate}
               className={`app-sidebar__link${isActive ? ' app-sidebar__link--active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
-              title={collapsed ? label : undefined}
+              title={label}
             >
               <Icon size={19} strokeWidth={1.8} aria-hidden="true" />
               <span>{label}</span>

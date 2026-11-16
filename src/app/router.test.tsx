@@ -129,6 +129,7 @@ describe('application routes', () => {
     expect(await screen.findByRole('heading', { name: 'Preview App Shell' })).toBeInTheDocument()
     expect(screen.getByText('Rina Anggraini')).toBeInTheDocument()
     expect(screen.getByText('rina@contoh.id')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page')
     await user.click(screen.getByRole('button', { name: 'Sidebar collapsed' }))
     expect(screen.getByRole('button', { name: 'Perluas sidebar' })).toBeInTheDocument()
     await user.click(screen.getByRole('link', { name: 'Projects' }))
