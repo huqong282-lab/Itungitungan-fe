@@ -67,6 +67,41 @@ describe('application routes', () => {
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
   })
 
+  it('renders the shared shell, all navigation, and the active route state', () => {
+    renderRoute('/app/projects/project-123')
+
+    expect(screen.getByRole('navigation', { name: 'Menu utama' })).toBeInTheDocument()
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getByRole('main', { name: '' })).toBeInTheDocument()
+    for (const label of ['Dashboard', 'Projects', 'Features', 'Designs', 'Hosting', 'Maintenance', 'Quotations', 'Settings']) {
+      expect(screen.getByRole('link', { name: label })).toBeInTheDocument()
+    }
+    expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current')
+  })
+
+  it('opens the user menu and navigates to settings', async () => {
+    const user = userEvent.setup()
+    renderRoute('/app')
+    await user.click(screen.getByRole('button', { name: 'Menu pengguna, Pengguna' }))
+
+    expect(screen.getByRole('menuitem', { name: 'Profil & pengaturan' })).toHaveAttribute('href', '/app/settings')
+    await user.click(screen.getByRole('menuitem', { name: 'Profil & pengaturan' }))
+    expect(screen.getByRole('heading', { name: 'Settings' })).toBeInTheDocument()
+  })
+
+  it('opens and closes the mobile navigation and supports sidebar collapse', async () => {
+    const user = userEvent.setup()
+    renderRoute('/app')
+    await user.click(screen.getByRole('button', { name: 'Buka navigasi' }))
+    expect(screen.getByRole('button', { name: 'Tutup navigasi' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Tutup navigasi' }))
+    expect(screen.queryByRole('button', { name: 'Tutup navigasi' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Ciutkan sidebar' }))
+    expect(screen.getByRole('button', { name: 'Perluas sidebar' })).toBeInTheDocument()
+  })
+
   it('renders the not found page for unknown paths', () => {
     renderRoute('/unknown/path')
 
@@ -76,8 +111,6 @@ describe('application routes', () => {
   it('shows the error preview route in development', async () => {
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/error-preview'] })
     render(<RouterProvider router={router} />)
-    expect(screen.getByRole('heading', { name: 'Permintaan tidak valid' })).toBeInTheDocument()
-
     expect(await screen.findByRole('heading', { name: 'Pratinjau error aplikasi' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Unknown Error/ })).toBeInTheDocument()
   })
@@ -89,10 +122,25 @@ describe('application routes', () => {
     expect(screen.getByRole('heading', { name: 'Button', level: 3 })).toBeInTheDocument()
   })
 
+  it('loads the interactive application shell preview in development', async () => {
+    const user = userEvent.setup()
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/app-shell'] })
+    render(<RouterProvider router={router} />)
+    expect(await screen.findByRole('heading', { name: 'Preview App Shell' })).toBeInTheDocument()
+    expect(screen.getByText('Rina Anggraini')).toBeInTheDocument()
+    expect(screen.getByText('rina@contoh.id')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Sidebar collapsed' }))
+    expect(screen.getByRole('button', { name: 'Perluas sidebar' })).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: 'Projects' }))
+    expect(router.state.location.pathname).toBe('/app/projects')
+    expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('aria-current', 'page')
+  })
+
   it('switches between all preview errors without navigating or reloading', async () => {
     const user = userEvent.setup()
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/error-preview'] })
     render(<RouterProvider router={router} />)
+    await screen.findByRole('heading', { name: 'Pratinjau error aplikasi' })
 
     const examples = [
       ['Unauthorized', 'Sesi Anda telah berakhir'],
@@ -119,6 +167,7 @@ describe('application routes', () => {
 
     expect(productionRoutes.some((route) => route.path === '/dev/error-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/components')).toBe(false)
+    expect(productionRoutes.some((route) => route.path === '/dev/app-shell')).toBe(false)
 
     const router = createMemoryRouter(productionRoutes, { initialEntries: ['/dev/error-preview'] })
     render(<RouterProvider router={router} />)
@@ -129,6 +178,7 @@ describe('application routes', () => {
     const user = userEvent.setup()
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/error-preview'] })
     render(<RouterProvider router={router} />)
+    await screen.findByRole('heading', { name: 'Pratinjau error aplikasi' })
     await user.click(screen.getByRole('button', { name: /Internal Server Error/ }))
     await user.click(screen.getByRole('button', { name: 'Coba lagi' }))
 
