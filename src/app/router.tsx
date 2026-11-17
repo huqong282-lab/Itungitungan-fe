@@ -75,6 +75,7 @@ if (import.meta.env.DEV) {
   appRoutes.push({ path: '/dev/error-preview', lazy: async () => { const module = await import('../pages/ErrorPreviewPage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/components', lazy: async () => { const module = await import('../pages/ComponentShowcasePage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/app-shell', lazy: async () => { const module = await import('../pages/AppShellPreviewPage'); return { Component: module.default } } })
+  appRoutes.push({ path: '/dev/responsive-navigation', lazy: async () => { const module = await import('../pages/AppShellPreviewPage'); return { Component: module.default } } })
 }
 
 appRoutes.push(

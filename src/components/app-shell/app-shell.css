@@ -16,6 +16,8 @@
   border-right: 1px solid var(--color-border);
   background: var(--color-surface);
   transition: width 180ms ease, transform 180ms ease;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .app-sidebar__brand {
@@ -30,6 +32,9 @@
   text-decoration: none;
   white-space: nowrap;
 }
+
+.app-sidebar__brand-row { display: contents; }
+.app-sidebar__close { display: none; }
 
 .app-sidebar__brand-mark {
   display: grid;
@@ -99,17 +104,26 @@
 .app-shell-preview__actions button { min-height: 40px; padding: 0 14px; border: 1px solid var(--color-border); border-radius: var(--radius-medium); color: var(--color-text-secondary); background: white; cursor: pointer; }
 .app-shell-preview__actions button[aria-pressed="true"] { border-color: var(--color-brand-primary); color: var(--color-brand-primary); background: var(--color-brand-primary-subtle); }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .app-shell { --shell-sidebar-width: 0px; }
   .app-shell--collapsed { --shell-sidebar-width: 0px; }
-  .app-sidebar { width: min(288px, calc(100vw - 52px)); transform: translateX(-105%); }
-  .app-sidebar--mobile-open { z-index: 60; transform: translateX(0); box-shadow: var(--shadow-popover); }
+  .app-sidebar { z-index: 60; width: min(320px, calc(100vw - 48px)); transform: translateX(-105%); visibility: hidden; }
+  .app-sidebar--mobile-open { transform: translateX(0); visibility: visible; box-shadow: var(--shadow-popover); }
+  .app-sidebar__brand-row { display: flex; min-height: 76px; align-items: center; justify-content: space-between; padding-right: 12px; }
   .app-sidebar__brand { min-height: 68px; }
+  .app-sidebar__close { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border: 0; border-radius: var(--radius-medium); color: var(--color-text-secondary); background: transparent; cursor: pointer; }
+  .app-sidebar__close:hover { color: var(--color-text-primary); background: var(--color-background); }
+  .app-sidebar__close:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
   .app-shell__scrim { position: fixed; z-index: 55; inset: 0; display: block; border: 0; background: rgb(15 23 42 / 42%); }
   .app-shell__main { margin-left: 0; }
-  .app-topbar { height: 64px; padding: 0 14px; }
+  .app-topbar { height: 64px; padding: 0 24px; }
   .app-topbar__mobile-menu { display: grid; }
   .app-topbar__collapse { display: none; }
+  .app-shell__content { padding: 28px 24px; }
+}
+
+@media (max-width: 767px) {
+  .app-topbar { padding: 0 14px; }
   .app-shell__content { padding: 24px 18px; }
   .app-user-menu__identity { display: none; }
   .app-user-menu__trigger { gap: 5px; padding: 4px; }

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocation } from 'react-router'
 import { appNavigation } from './navigation'
 import { Sidebar } from './Sidebar'
@@ -19,6 +19,8 @@ export function AppShell({ children, user, initialCollapsed = false, collapsed: 
   const [internalCollapsed, setInternalCollapsed] = useState(initialCollapsed)
   const collapsed = controlledCollapsed ?? internalCollapsed
   const [mobileOpen, setMobileOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const drawerCloseRef = useRef<HTMLButtonElement>(null)
   const location = useLocation()
   const activePath = activePathOverride ?? location.pathname
   const activeItem = [...appNavigation]
@@ -27,7 +29,31 @@ export function AppShell({ children, user, initialCollapsed = false, collapsed: 
       ? activePath === item.to
       : activePath === item.to || activePath.startsWith(`${item.to}/`))
 
-  const closeMobile = () => setMobileOpen(false)
+  const closeMobile = () => {
+    setMobileOpen(false)
+    menuButtonRef.current?.focus()
+  }
+  useEffect(() => {
+    if (!mobileOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    drawerCloseRef.current?.focus()
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeMobile()
+      }
+    }
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) setMobileOpen(false)
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('resize', handleResize)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [mobileOpen])
   const toggleSidebar = () => {
     const next = !collapsed
     if (controlledCollapsed === undefined) setInternalCollapsed(next)
@@ -36,17 +62,21 @@ export function AppShell({ children, user, initialCollapsed = false, collapsed: 
 
   return (
     <div className={`app-shell${collapsed ? ' app-shell--collapsed' : ''}`}>
-      {mobileOpen && <button type="button" className="app-shell__scrim" aria-label="Tutup navigasi" onClick={closeMobile} />}
+      {mobileOpen && <button type="button" className="app-shell__scrim" aria-label="Tutup navigasi dengan backdrop" onClick={closeMobile} />}
       <Sidebar
         activePath={activePath}
         mobileOpen={mobileOpen}
         onNavigate={closeMobile}
+        onClose={closeMobile}
+        closeButtonRef={drawerCloseRef}
       />
       <div className="app-shell__main">
         <Topbar
           user={user}
           activeLabel={activeItem?.label ?? 'Itungitungan'}
           onOpenNavigation={() => setMobileOpen(true)}
+          menuButtonRef={menuButtonRef}
+          mobileOpen={mobileOpen}
           onToggleSidebar={toggleSidebar}
           collapsed={collapsed}
         />

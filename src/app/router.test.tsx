@@ -90,13 +90,36 @@ describe('application routes', () => {
     expect(screen.getByRole('heading', { name: 'Settings' })).toBeInTheDocument()
   })
 
-  it('opens and closes the mobile navigation and supports sidebar collapse', async () => {
+  it('opens and closes the responsive navigation and supports desktop sidebar collapse', async () => {
     const user = userEvent.setup()
     renderRoute('/app')
-    await user.click(screen.getByRole('button', { name: 'Buka navigasi' }))
+    const trigger = screen.getByRole('button', { name: 'Buka navigasi' })
+    await user.click(trigger)
     expect(screen.getByRole('button', { name: 'Tutup navigasi' })).toBeInTheDocument()
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(document.body.style.overflow).toBe('hidden')
     await user.click(screen.getByRole('button', { name: 'Tutup navigasi' }))
-    expect(screen.queryByRole('button', { name: 'Tutup navigasi' })).not.toBeInTheDocument()
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(document.body.style.overflow).toBe('')
+
+    await user.click(trigger)
+    await user.click(screen.getByRole('button', { name: 'Tutup navigasi dengan backdrop' }))
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+    await user.click(trigger)
+    await user.click(screen.getByRole('button', { name: 'Tutup navigasi' }))
+    expect(trigger).toHaveFocus()
+
+    await user.click(trigger)
+    await user.keyboard('{Escape}')
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+    await user.click(trigger)
+    await user.click(screen.getByRole('button', { name: 'Tutup navigasi' }))
+    await user.click(trigger)
+    await user.click(screen.getByRole('link', { name: 'Projects' }))
+    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Buka navigasi' })).toHaveAttribute('aria-expanded', 'false')
 
     await user.click(screen.getByRole('button', { name: 'Ciutkan sidebar' }))
     expect(screen.getByRole('button', { name: 'Perluas sidebar' })).toBeInTheDocument()
@@ -126,7 +149,7 @@ describe('application routes', () => {
     const user = userEvent.setup()
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/app-shell'] })
     render(<RouterProvider router={router} />)
-    expect(await screen.findByRole('heading', { name: 'Preview App Shell' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Preview Responsive Navigation' })).toBeInTheDocument()
     expect(screen.getByText('Rina Anggraini')).toBeInTheDocument()
     expect(screen.getByText('rina@contoh.id')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page')
@@ -135,6 +158,12 @@ describe('application routes', () => {
     await user.click(screen.getByRole('link', { name: 'Projects' }))
     expect(router.state.location.pathname).toBe('/app/projects')
     expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('provides the responsive navigation preview route only in development', async () => {
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/responsive-navigation'] })
+    render(<RouterProvider router={router} />)
+    expect(await screen.findByRole('heading', { name: 'Preview Responsive Navigation' })).toBeInTheDocument()
   })
 
   it('switches between all preview errors without navigating or reloading', async () => {
@@ -169,6 +198,7 @@ describe('application routes', () => {
     expect(productionRoutes.some((route) => route.path === '/dev/error-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/components')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/app-shell')).toBe(false)
+    expect(productionRoutes.some((route) => route.path === '/dev/responsive-navigation')).toBe(false)
 
     const router = createMemoryRouter(productionRoutes, { initialEntries: ['/dev/error-preview'] })
     render(<RouterProvider router={router} />)

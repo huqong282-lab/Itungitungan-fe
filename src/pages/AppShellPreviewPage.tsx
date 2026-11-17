@@ -15,13 +15,13 @@ function AppShellPreviewPage() {
     <AppShell user={previewUser} collapsed={collapsed} onCollapsedChange={setCollapsed} activePathOverride={pathname === '/dev/app-shell' ? '/app' : undefined}>
       <div className="app-shell-preview">
         <header className="app-shell-preview__heading">
-          <h1>Preview App Shell</h1>
-          <p>Pratinjau interaktif layout aplikasi Itungitungan dan navigasi responsif.</p>
+          <h1>Preview Responsive Navigation</h1>
+          <p>Pratinjau interaktif navigasi desktop, drawer tablet, dan drawer mobile Itungitungan.</p>
         </header>
         <section className="app-shell-preview__card" aria-live="polite">
           <p className="app-shell-preview__eyebrow">Konten halaman</p>
           <h2>{activeContent}</h2>
-          <p>Area ini mewakili halaman yang dirender oleh Outlet. Pilih menu di sidebar untuk melihat active navigation berubah.</p>
+          <p>Ubah lebar browser untuk mencoba sidebar desktop atau drawer pada tablet dan mobile. Buka drawer lewat tombol hamburger, lalu tutup lewat tombol X, backdrop, Escape, atau dengan memilih menu.</p>
           <div className="app-shell-preview__actions">
             <button type="button" aria-pressed={!collapsed} onClick={() => setCollapsed(false)}>Sidebar expanded</button>
             <button type="button" aria-pressed={collapsed} onClick={() => setCollapsed(true)}>Sidebar collapsed</button>
