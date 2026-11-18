@@ -2,6 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import QueryProvider from './QueryProvider'
 import { appRoutes } from './router'
 
 afterEach(() => {
@@ -10,7 +11,7 @@ afterEach(() => {
 })
 
 const routes = [
-  ['/login', 'Login'],
+  ['/login', 'Masuk'],
   ['/register', 'Register'],
   ['/app', 'Dashboard'],
   ['/app/projects', 'Projects'],
@@ -35,7 +36,7 @@ const routes = [
 
 function renderRoute(path: string) {
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
-  return render(<RouterProvider router={router} />)
+  return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
 }
 
 describe('application routes', () => {
@@ -160,6 +161,13 @@ describe('application routes', () => {
     expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('aria-current', 'page')
   })
 
+  it('loads the login preview route in development', async () => {
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/login-preview'] })
+    render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
+    expect(await screen.findByRole('heading', { name: 'Preview Login Page' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Default' })).toBeInTheDocument()
+  })
+
   it('provides the responsive navigation preview route only in development', async () => {
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/responsive-navigation'] })
     render(<RouterProvider router={router} />)
@@ -196,6 +204,7 @@ describe('application routes', () => {
     const { appRoutes: productionRoutes } = await import('./router')
 
     expect(productionRoutes.some((route) => route.path === '/dev/error-preview')).toBe(false)
+    expect(productionRoutes.some((route) => route.path === '/dev/login-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/components')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/app-shell')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/responsive-navigation')).toBe(false)
