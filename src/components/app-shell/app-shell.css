@@ -91,6 +91,9 @@
 .app-user-menu__summary span { overflow: hidden; font-size: 12px; text-overflow: ellipsis; }
 .app-user-menu__popover a { display: flex; min-height: 40px; align-items: center; gap: 10px; margin-top: 5px; padding: 0 9px; border-radius: var(--radius-small); color: var(--color-text-secondary); font-size: 13px; text-decoration: none; }
 .app-user-menu__popover a:hover { color: var(--color-text-primary); background: var(--color-background); }
+.app-user-menu__logout { width: 100%; justify-content: flex-start; margin-top: 8px; }
+.app-user-menu__alert { margin-top: 8px; font-size: 11px; }
+.app-user-menu__popover [role="menuitem"]:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
 .app-user-menu__popover a:focus-visible, .app-user-menu__trigger:focus-visible, .app-topbar__icon:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
 
 .app-shell-preview { display: grid; gap: 24px; }
