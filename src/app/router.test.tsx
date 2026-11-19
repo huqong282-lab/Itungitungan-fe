@@ -12,7 +12,7 @@ afterEach(() => {
 
 const routes = [
   ['/login', 'Masuk'],
-  ['/register', 'Register'],
+  ['/register', 'Buat akun'],
   ['/app', 'Dashboard'],
   ['/app/projects', 'Projects'],
   ['/app/projects/new', 'Create Project'],
@@ -168,6 +168,13 @@ describe('application routes', () => {
     expect(screen.getByRole('button', { name: 'Default' })).toBeInTheDocument()
   })
 
+  it('loads the register preview route in development', async () => {
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/register-preview'] })
+    render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
+    expect(await screen.findByRole('heading', { name: 'Preview Register Page' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Password Mismatch' })).toBeInTheDocument()
+  })
+
   it('provides the responsive navigation preview route only in development', async () => {
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/responsive-navigation'] })
     render(<RouterProvider router={router} />)
@@ -205,6 +212,7 @@ describe('application routes', () => {
 
     expect(productionRoutes.some((route) => route.path === '/dev/error-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/login-preview')).toBe(false)
+    expect(productionRoutes.some((route) => route.path === '/dev/register-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/components')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/app-shell')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/responsive-navigation')).toBe(false)

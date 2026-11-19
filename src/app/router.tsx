@@ -2,10 +2,11 @@ import { createBrowserRouter, type RouteObject } from 'react-router'
 import ApplicationLayout from './ApplicationLayout'
 import RoutePlaceholderPage, { NotFoundPage } from '../pages/RoutePlaceholderPage'
 import LoginPage from '../pages/LoginPage'
+import RegisterPage from '../pages/RegisterPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
-  { path: '/register', element: <RoutePlaceholderPage title="Register" /> },
+  { path: '/register', element: <RegisterPage /> },
   {
     path: '/app',
     element: <ApplicationLayout />,
@@ -74,6 +75,7 @@ export const appRoutes: RouteObject[] = [
 
 if (import.meta.env.DEV) {
   appRoutes.push({ path: '/dev/login-preview', lazy: async () => { const module = await import('../pages/LoginPreviewPage'); return { Component: module.default } } })
+  appRoutes.push({ path: '/dev/register-preview', lazy: async () => { const module = await import('../pages/RegisterPreviewPage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/error-preview', lazy: async () => { const module = await import('../pages/ErrorPreviewPage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/components', lazy: async () => { const module = await import('../pages/ComponentShowcasePage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/app-shell', lazy: async () => { const module = await import('../pages/AppShellPreviewPage'); return { Component: module.default } } })
