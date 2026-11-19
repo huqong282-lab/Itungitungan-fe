@@ -76,6 +76,7 @@ export const appRoutes: RouteObject[] = [
 if (import.meta.env.DEV) {
   appRoutes.push({ path: '/dev/login-preview', lazy: async () => { const module = await import('../pages/LoginPreviewPage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/register-preview', lazy: async () => { const module = await import('../pages/RegisterPreviewPage'); return { Component: module.default } } })
+  appRoutes.push({ path: '/dev/logout-preview', lazy: async () => { const module = await import('../pages/LogoutPreviewPage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/error-preview', lazy: async () => { const module = await import('../pages/ErrorPreviewPage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/components', lazy: async () => { const module = await import('../pages/ComponentShowcasePage'); return { Component: module.default } } })
   appRoutes.push({ path: '/dev/app-shell', lazy: async () => { const module = await import('../pages/AppShellPreviewPage'); return { Component: module.default } } })

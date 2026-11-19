@@ -149,7 +149,7 @@ describe('application routes', () => {
   it('loads the interactive application shell preview in development', async () => {
     const user = userEvent.setup()
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/app-shell'] })
-    render(<RouterProvider router={router} />)
+    render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
     expect(await screen.findByRole('heading', { name: 'Preview Responsive Navigation' })).toBeInTheDocument()
     expect(screen.getByText('Rina Anggraini')).toBeInTheDocument()
     expect(screen.getByText('rina@contoh.id')).toBeInTheDocument()
@@ -175,9 +175,16 @@ describe('application routes', () => {
     expect(screen.getByRole('button', { name: 'Password Mismatch' })).toBeInTheDocument()
   })
 
+  it('loads the logout preview route in development', async () => {
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/logout-preview'] })
+    render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
+    expect(await screen.findByRole('heading', { name: 'Preview Logout' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Network error' })).toBeInTheDocument()
+  })
+
   it('provides the responsive navigation preview route only in development', async () => {
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/responsive-navigation'] })
-    render(<RouterProvider router={router} />)
+    render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
     expect(await screen.findByRole('heading', { name: 'Preview Responsive Navigation' })).toBeInTheDocument()
   })
 
@@ -213,6 +220,7 @@ describe('application routes', () => {
     expect(productionRoutes.some((route) => route.path === '/dev/error-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/login-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/register-preview')).toBe(false)
+    expect(productionRoutes.some((route) => route.path === '/dev/logout-preview')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/components')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/app-shell')).toBe(false)
     expect(productionRoutes.some((route) => route.path === '/dev/responsive-navigation')).toBe(false)
