@@ -630,16 +630,19 @@ redirect /login
 
 #### Fields
 
-```text
-Developer Rate
-Working Hours / Day
-Buffer
-Default Margin
-Default Rush
-Free Revision Count
-Additional Revision Price
-Currency
-```
+Settings API properties:
+
+| Field | Property | Type |
+|---|---|---|
+| Developer Rate | `developerRate` | Integer |
+| Working Hours / Day | `workingHoursPerDay` | Integer |
+| Buffer | `buffer` | Number |
+| Default Margin | `margin` | Number |
+| Default Rush | `rush` | Number |
+| Free Revision Count | `freeRevisionCount` | Integer |
+| Additional Revision Price | `additionalRevisionPrice` | Integer |
+
+Currency is not part of the Settings API and is outside the scope of FE-019.
 
 #### API
 
@@ -648,15 +651,19 @@ GET /api/settings
 PATCH /api/settings
 ```
 
+GET returns `{ data: settings }`. PATCH accepts a partial settings object and returns `{ data: updatedSettings }`, using only the properties listed above.
+
 #### Validation
 
-```text
-rate >= 0
-workingHours > 0
-percentage 0..100
-revision >= 0
-price >= 0
-```
+Follow the backend Settings schema:
+
+- `developerRate`: integer greater than or equal to 0.
+- `workingHoursPerDay`: integer greater than 0.
+- `buffer`, `margin`, `rush`: number from 0 through 100, inclusive.
+- `freeRevisionCount`: integer greater than or equal to 0.
+- `additionalRevisionPrice`: integer greater than or equal to 0.
+
+`PATCH /api/settings` accepts these properties as optional fields and returns the updated settings in `{ data: ... }`.
 
 #### Acceptance Criteria
 
