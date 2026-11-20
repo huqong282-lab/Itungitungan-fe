@@ -4,6 +4,7 @@ import RoutePlaceholderPage, { NotFoundPage } from '../pages/RoutePlaceholderPag
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import { AuthGuard } from './AuthGuard'
+import SettingsPage from '../pages/SettingsPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
@@ -72,7 +73,7 @@ export const appRoutes: RouteObject[] = [
         path: 'quotations/:quotationId',
         element: <RoutePlaceholderPage title="Quotation Details" />,
       },
-      { path: 'settings', element: <RoutePlaceholderPage title="Settings" /> },
+      { path: 'settings', element: <SettingsPage /> },
         ],
       },
     ],

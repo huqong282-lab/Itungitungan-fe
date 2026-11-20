@@ -6,6 +6,7 @@ import QueryProvider from './QueryProvider'
 import { appRoutes } from './router'
 import { queryClient } from '../lib/queryClient'
 import { currentUserQueryKey } from './AuthGuard'
+import { settingsQueryKey } from '../pages/SettingsPage'
 
 afterEach(() => {
   cleanup()
@@ -39,6 +40,7 @@ const routes = [
 function renderRoute(path: string) {
   queryClient.clear()
   queryClient.setQueryData(currentUserQueryKey, { data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com' } })
+  queryClient.setQueryData(settingsQueryKey, { data: { developerRate: 75000, workingHoursPerDay: 8, buffer: 20, margin: 30, rush: 10, freeRevisionCount: 2, additionalRevisionPrice: 150000 } })
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
   return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
 }
