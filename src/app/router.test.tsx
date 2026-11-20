@@ -4,6 +4,8 @@ import { createMemoryRouter, RouterProvider } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import QueryProvider from './QueryProvider'
 import { appRoutes } from './router'
+import { queryClient } from '../lib/queryClient'
+import { currentUserQueryKey } from './AuthGuard'
 
 afterEach(() => {
   cleanup()
@@ -35,6 +37,8 @@ const routes = [
 ] as const
 
 function renderRoute(path: string) {
+  queryClient.clear()
+  queryClient.setQueryData(currentUserQueryKey, { data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com' } })
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
   return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
 }

@@ -3,14 +3,18 @@ import ApplicationLayout from './ApplicationLayout'
 import RoutePlaceholderPage, { NotFoundPage } from '../pages/RoutePlaceholderPage'
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
+import { AuthGuard } from './AuthGuard'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   {
     path: '/app',
-    element: <ApplicationLayout />,
+    element: <AuthGuard />,
     children: [
+      {
+        element: <ApplicationLayout />,
+        children: [
       { index: true, element: <RoutePlaceholderPage title="Dashboard" /> },
       { path: 'projects', element: <RoutePlaceholderPage title="Projects" /> },
       {
@@ -69,6 +73,8 @@ export const appRoutes: RouteObject[] = [
         element: <RoutePlaceholderPage title="Quotation Details" />,
       },
       { path: 'settings', element: <RoutePlaceholderPage title="Settings" /> },
+        ],
+      },
     ],
   },
 ]
