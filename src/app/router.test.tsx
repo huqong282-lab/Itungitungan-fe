@@ -23,7 +23,7 @@ const routes = [
   ['/app/projects/project-123', 'Project Details'],
   ['/app/features', 'Feature List'],
   ['/app/features/new', 'Create Feature'],
-  ['/app/features/feature-123', 'Feature Details'],
+  ['/app/features/feature-123', 'Edit Feature'],
   ['/app/designs', 'Designs'],
   ['/app/designs/new', 'Create Design'],
   ['/app/designs/design-123', 'Design Details'],
@@ -43,6 +43,7 @@ function renderRoute(path: string) {
   queryClient.setQueryData(currentUserQueryKey, { data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com' } })
   queryClient.setQueryData(settingsQueryKey, { data: { developerRate: 75000, workingHoursPerDay: 8, buffer: 20, margin: 30, rush: 10, freeRevisionCount: 2, additionalRevisionPrice: 150000 } })
   queryClient.setQueryData([...featuresQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
+  queryClient.setQueryData([...featuresQueryKey, 'detail', 'feature-123'], { data: { id: 'feature-123', name: 'Feature', description: null, category: null, baseEstimatedHours: 0, isActive: true, options: [] } })
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
   return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
 }
@@ -56,7 +57,6 @@ describe('application routes', () => {
 
   it.each([
     ['/app/projects/project-123', 'project-123'],
-    ['/app/features/feature-123', 'feature-123'],
     ['/app/designs/design-123', 'design-123'],
     ['/app/hosting/hosting-123', 'hosting-123'],
     ['/app/maintenance/maintenance-123', 'maintenance-123'],
@@ -65,6 +65,12 @@ describe('application routes', () => {
     renderRoute(path)
 
     expect(screen.getByText(id)).toBeInTheDocument()
+  })
+
+  it('renders the feature editor route using its cached detail data', () => {
+    renderRoute('/app/features/feature-123')
+    expect(screen.getByRole('heading', { name: 'Edit Feature' })).toBeInTheDocument()
+    expect(screen.getByLabelText(/^Name/)).toHaveValue('Feature')
   })
 
   it('navigates between application routes', async () => {
