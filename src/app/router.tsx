@@ -6,6 +6,7 @@ import RegisterPage from '../pages/RegisterPage'
 import { AuthGuard } from './AuthGuard'
 import SettingsPage from '../pages/SettingsPage'
 import FeaturesPage from '../pages/FeaturesPage'
+import FeatureEditorPage from '../pages/FeatureEditorPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
@@ -30,11 +31,11 @@ export const appRoutes: RouteObject[] = [
       { path: 'features', element: <FeaturesPage /> },
       {
         path: 'features/new',
-        element: <RoutePlaceholderPage title="Create Feature" />,
+        element: <FeatureEditorPage mode="create" />,
       },
       {
         path: 'features/:featureId',
-        element: <RoutePlaceholderPage title="Feature Details" />,
+        element: <FeatureEditorPage mode="edit" />,
       },
       { path: 'designs', element: <RoutePlaceholderPage title="Designs" /> },
       {
