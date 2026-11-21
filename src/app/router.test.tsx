@@ -7,6 +7,7 @@ import { appRoutes } from './router'
 import { queryClient } from '../lib/queryClient'
 import { currentUserQueryKey } from './AuthGuard'
 import { settingsQueryKey } from '../pages/SettingsPage'
+import { featuresQueryKey } from '../pages/FeaturesPage'
 
 afterEach(() => {
   cleanup()
@@ -20,7 +21,7 @@ const routes = [
   ['/app/projects', 'Projects'],
   ['/app/projects/new', 'Create Project'],
   ['/app/projects/project-123', 'Project Details'],
-  ['/app/features', 'Features'],
+  ['/app/features', 'Feature List'],
   ['/app/features/new', 'Create Feature'],
   ['/app/features/feature-123', 'Feature Details'],
   ['/app/designs', 'Designs'],
@@ -41,6 +42,7 @@ function renderRoute(path: string) {
   queryClient.clear()
   queryClient.setQueryData(currentUserQueryKey, { data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com' } })
   queryClient.setQueryData(settingsQueryKey, { data: { developerRate: 75000, workingHoursPerDay: 8, buffer: 20, margin: 30, rush: 10, freeRevisionCount: 2, additionalRevisionPrice: 150000 } })
+  queryClient.setQueryData([...featuresQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
   return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
 }
