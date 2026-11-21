@@ -5,6 +5,7 @@ import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import { AuthGuard } from './AuthGuard'
 import SettingsPage from '../pages/SettingsPage'
+import FeaturesPage from '../pages/FeaturesPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
@@ -26,7 +27,7 @@ export const appRoutes: RouteObject[] = [
         path: 'projects/:projectId',
         element: <RoutePlaceholderPage title="Project Details" />,
       },
-      { path: 'features', element: <RoutePlaceholderPage title="Features" /> },
+      { path: 'features', element: <FeaturesPage /> },
       {
         path: 'features/new',
         element: <RoutePlaceholderPage title="Create Feature" />,
