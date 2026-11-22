@@ -1,13 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router'
 import { z } from 'zod'
 import { Alert, Button, ErrorState, FormField, Input, Textarea } from '../components/ui'
-import { featuresApi, type FeatureCreateRequest, type FeatureSummary } from '../lib/api/features'
+import { featuresApi, type FeatureCreateRequest, type FeatureOption, type FeatureSummary } from '../lib/api/features'
 import { mapApplicationError } from '../lib/errors/errorMessages'
 import { featuresQueryKey } from './FeaturesPage'
+import FeatureOptionEditor from './FeatureOptionEditor'
 import './FeatureEditorPage.css'
 
 const featureSchema = z.object({
@@ -41,6 +42,8 @@ export default function FeatureEditorPage({ mode }: { mode: 'create' | 'edit' })
   const { featureId } = useParams<{ featureId: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [editingOption, setEditingOption] = useState<FeatureOption | null | undefined>(undefined)
+  const [optionSuccess, setOptionSuccess] = useState('')
   const originalValues = useRef<FeatureFormValues | null>(null)
   const form = useForm<FeatureFormValues>({
     resolver: zodResolver(featureSchema),
@@ -111,12 +114,32 @@ export default function FeatureEditorPage({ mode }: { mode: 'create' | 'edit' })
       <header className="feature-editor__heading"><h1>{mode === 'create' ? 'Create Feature' : 'Edit Feature'}</h1><p>{mode === 'create' ? 'Tambahkan fitur ke katalog Anda.' : 'Perbarui informasi fitur pada katalog Anda.'}</p></header>
       <form className="feature-editor__form" noValidate onSubmit={submit}>
         {submitError && <Alert variant="error" title={submitError.title}>{submitError.description}</Alert>}
+        {optionSuccess && <Alert variant="success" title="Berhasil">{optionSuccess}</Alert>}
         <FormField label="Name" required error={form.formState.errors.name?.message}><Input autoFocus disabled={mutation.isPending} {...form.register('name')} /></FormField>
         <FormField label="Description" error={form.formState.errors.description?.message}><Textarea rows={4} disabled={mutation.isPending} {...form.register('description')} /></FormField>
         <FormField label="Category" error={form.formState.errors.category?.message}><Input disabled={mutation.isPending} {...form.register('category')} /></FormField>
         <FormField label="Base Estimated Hours" required hint="Masukkan bilangan bulat 0 atau lebih." error={form.formState.errors.baseEstimatedHours?.message}><Input type="number" min={0} step={1} disabled={mutation.isPending} {...form.register('baseEstimatedHours', { valueAsNumber: true })} /></FormField>
         <div className="feature-editor__actions"><Button type="button" variant="outline" disabled={mutation.isPending} onClick={() => navigate('/app/features')}>Cancel</Button><Button type="submit" loading={mutation.isPending}>{mutation.isPending ? 'Saving...' : 'Save'}</Button></div>
       </form>
+      {mode === 'edit' && feature && <section className="feature-editor__options" aria-labelledby="feature-options-title">
+        <header className="feature-editor__options-heading">
+          <div><h2 id="feature-options-title">Options</h2><p>Atur pilihan yang dapat dikonfigurasi pada feature ini.</p></div>
+          <Button type="button" onClick={() => { setOptionSuccess(''); setEditingOption(null) }}>Add Option</Button>
+        </header>
+        {feature.options.length === 0 ? <p className="feature-editor__options-empty">Belum ada option untuk feature ini.</p> : <ul className="feature-editor__option-list">
+          {feature.options.map(option => <li key={option.id} className="feature-editor__option">
+            <div><strong>{option.name}</strong><span>{option.selectionType === 'SINGLE' ? 'Satu pilihan' : 'Beberapa pilihan'}</span></div>
+            <Button type="button" variant="outline" size="small" aria-label={`Edit ${option.name}`} onClick={() => { setOptionSuccess(''); setEditingOption(option) }}>Edit</Button>
+          </li>)}
+        </ul>}
+      </section>}
+      {featureId && editingOption !== undefined && <FeatureOptionEditor
+        key={editingOption?.id ?? 'create'}
+        featureId={featureId}
+        option={editingOption}
+        onClose={() => setEditingOption(undefined)}
+        onSaved={message => { setEditingOption(undefined); setOptionSuccess(message) }}
+      />}
     </section>
   )
 }
