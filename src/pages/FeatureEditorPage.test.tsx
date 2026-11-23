@@ -9,10 +9,10 @@ import { featuresApi, type FeatureDetail, type FeatureSummary } from '../lib/api
 import { ApiError } from '../lib/api/client'
 
 vi.mock('../lib/api/features', () => ({ featuresApi: {
-  list: vi.fn(), create: vi.fn(), update: vi.fn(), setActive: vi.fn(), get: vi.fn(),
+  list: vi.fn(), create: vi.fn(), update: vi.fn(), setActive: vi.fn(), get: vi.fn(), createOption: vi.fn(), updateOption: vi.fn(), createOptionValue: vi.fn(), updateOptionValue: vi.fn(),
 } }))
 
-const feature: FeatureDetail = { id: 'feature-a', name: 'Payment Gateway', description: 'Payment integration', category: 'Payment', baseEstimatedHours: 8, isActive: true, options: [] }
+const feature: FeatureDetail = { id: 'feature-a', name: 'Payment Gateway', description: 'Payment integration', category: 'Payment', baseEstimatedHours: 8, isActive: true, options: [{ id: 'option-provider', name: 'Provider', selectionType: 'SINGLE', values: [{ id: 'value-midtrans', label: 'Midtrans', estimatedHours: 8, isDefault: true, isActive: true }] }] }
 const summary: FeatureSummary = { id: feature.id, name: feature.name, description: feature.description, category: feature.category, baseEstimatedHours: feature.baseEstimatedHours, isActive: feature.isActive }
 const listResponse = { data: [summary], meta: { page: 1, pageSize: 20, total: 1, totalPages: 1 } }
 
@@ -89,6 +89,18 @@ describe('FeatureEditorPage', () => {
     expect(screen.getByLabelText('Description')).toHaveValue('Payment integration')
     expect(screen.getByLabelText('Category')).toHaveValue('Payment')
     expect(screen.getByLabelText(/^Base Estimated Hours/)).toHaveValue(8)
+  })
+
+  it('lists values within their option and opens the related value editor', async () => {
+    const user = userEvent.setup()
+    renderEditor('/app/features/feature-a', { withList: false })
+    await screen.findByRole('heading', { name: 'Edit Feature' })
+    expect(screen.getByText('Provider')).toBeInTheDocument()
+    expect(screen.getByText('Midtrans')).toBeInTheDocument()
+    expect(screen.getByText('8 jam · Default')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Edit Midtrans' }))
+    expect(await screen.findByRole('heading', { name: 'Edit Feature Value' })).toBeInTheDocument()
+    expect(screen.getByLabelText(/^Label/)).toHaveValue('Midtrans')
   })
 
   it('does not submit an update while edit data is still loading', async () => {
