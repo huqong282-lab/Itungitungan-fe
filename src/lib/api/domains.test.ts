@@ -56,6 +56,16 @@ describe('domain APIs', () => {
     ])
   })
 
+  it('fetches the paginated design list from GET /api/designs', async () => {
+    const requests = captureRequests()
+    await designsApi.list({ page: 2, pageSize: 20, search: 'Brand', isActive: true })
+
+    expect(requests).toEqual([{
+      url: 'http://localhost:3000/api/designs?page=2&pageSize=20&search=Brand&isActive=true',
+      method: 'GET',
+    }])
+  })
+
   it('routes hosting and maintenance plan operations using their distinct route prefixes', async () => {
     const requests = captureRequests()
     await hostingApi.list({ page: 2 })
