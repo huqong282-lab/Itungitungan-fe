@@ -9,6 +9,7 @@ import { featuresApi, type FeatureCreateRequest, type FeatureOption, type Featur
 import { mapApplicationError } from '../lib/errors/errorMessages'
 import { featuresQueryKey } from './FeaturesPage'
 import FeatureOptionEditor from './FeatureOptionEditor'
+import FeatureValueEditor from './FeatureValueEditor'
 import './FeatureEditorPage.css'
 
 const featureSchema = z.object({
@@ -43,6 +44,7 @@ export default function FeatureEditorPage({ mode }: { mode: 'create' | 'edit' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [editingOption, setEditingOption] = useState<FeatureOption | null | undefined>(undefined)
+  const [editingValue, setEditingValue] = useState<{ option: FeatureOption; value: FeatureOption['values'][number] | null } | null>(null)
   const [optionSuccess, setOptionSuccess] = useState('')
   const originalValues = useRef<FeatureFormValues | null>(null)
   const form = useForm<FeatureFormValues>({
@@ -127,9 +129,10 @@ export default function FeatureEditorPage({ mode }: { mode: 'create' | 'edit' })
           <Button type="button" onClick={() => { setOptionSuccess(''); setEditingOption(null) }}>Add Option</Button>
         </header>
         {feature.options.length === 0 ? <p className="feature-editor__options-empty">Belum ada option untuk feature ini.</p> : <ul className="feature-editor__option-list">
-          {feature.options.map(option => <li key={option.id} className="feature-editor__option">
-            <div><strong>{option.name}</strong><span>{option.selectionType === 'SINGLE' ? 'Satu pilihan' : 'Beberapa pilihan'}</span></div>
-            <Button type="button" variant="outline" size="small" aria-label={`Edit ${option.name}`} onClick={() => { setOptionSuccess(''); setEditingOption(option) }}>Edit</Button>
+          {feature.options.map(option => <li key={option.id} className="feature-editor__option feature-editor__option--with-values">
+            <div className="feature-editor__option-content"><div className="feature-editor__option-heading"><div><strong>{option.name}</strong><span>{option.selectionType === 'SINGLE' ? 'Satu pilihan' : 'Beberapa pilihan'}</span></div><div className="feature-editor__option-actions"><Button type="button" variant="outline" size="small" aria-label={`Edit ${option.name}`} onClick={() => { setOptionSuccess(''); setEditingOption(option) }}>Edit Option</Button><Button type="button" size="small" aria-label={`Add value to ${option.name}`} onClick={() => setEditingValue({ option, value: null })}>Add Value</Button></div></div>
+              {option.values.length === 0 ? <p className="feature-editor__values-empty">Belum ada value untuk option ini.</p> : <ul className="feature-editor__value-list">{option.values.map(value => <li key={value.id} className={!value.isActive ? 'is-inactive' : ''}><div><strong>{value.label}</strong><span>{value.estimatedHours} jam{value.isDefault ? ' · Default' : ''}{!value.isActive ? ' · Nonaktif' : ''}</span></div><Button type="button" variant="outline" size="small" aria-label={`Edit ${value.label}`} onClick={() => setEditingValue({ option, value })}>Edit</Button></li>)}</ul>}
+            </div>
           </li>)}
         </ul>}
       </section>}
@@ -139,6 +142,14 @@ export default function FeatureEditorPage({ mode }: { mode: 'create' | 'edit' })
         option={editingOption}
         onClose={() => setEditingOption(undefined)}
         onSaved={message => { setEditingOption(undefined); setOptionSuccess(message) }}
+      />}
+      {featureId && editingValue && <FeatureValueEditor
+        key={`${editingValue.option.id}:${editingValue.value?.id ?? 'create'}`}
+        featureId={featureId}
+        option={editingValue.option}
+        value={editingValue.value}
+        onClose={() => setEditingValue(null)}
+        onSaved={message => { setEditingValue(null); setOptionSuccess(message) }}
       />}
     </section>
   )
