@@ -8,6 +8,7 @@ import SettingsPage from '../pages/SettingsPage'
 import FeaturesPage from '../pages/FeaturesPage'
 import FeatureEditorPage from '../pages/FeatureEditorPage'
 import DesignsPage from '../pages/DesignsPage'
+import DesignEditorPage from '../pages/DesignEditorPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
@@ -41,11 +42,11 @@ export const appRoutes: RouteObject[] = [
       { path: 'designs', element: <DesignsPage /> },
       {
         path: 'designs/new',
-        element: <RoutePlaceholderPage title="Create Design" />,
+        element: <DesignEditorPage mode="create" />,
       },
       {
         path: 'designs/:designId',
-        element: <RoutePlaceholderPage title="Design Details" />,
+        element: <DesignEditorPage mode="edit" />,
       },
       { path: 'hosting', element: <RoutePlaceholderPage title="Hosting" /> },
       {

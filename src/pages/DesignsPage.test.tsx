@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Link, MemoryRouter, Route, Routes } from 'react-router'
-import DesignsPage from './DesignsPage'
+import DesignsPage, { designsQueryKey } from './DesignsPage'
 import { designsApi, type Design } from '../lib/api/designs'
 
 vi.mock('../lib/api/designs', () => ({ designsApi: { list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), setActive: vi.fn() } }))
@@ -14,10 +14,12 @@ const result = (data: Design[] = [design], page = 1, total = data.length, totalP
 
 function renderPage() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
-  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={['/app/designs']}><Routes>
+  const view = render(<QueryClientProvider client={client}><MemoryRouter initialEntries={['/app/designs']}><Routes>
     <Route path="/app/designs" element={<DesignsPage />} />
     <Route path="/app/designs/new" element={<><h1>Create Design destination</h1><Link to="/app/designs">Back</Link></>} />
+    <Route path="/app/designs/:designId" element={<><h1>Edit Design destination</h1><Link to="/app/designs">Back</Link></>} />
   </Routes></MemoryRouter></QueryClientProvider>)
+  return { ...view, client }
 }
 
 describe('DesignsPage', () => {
@@ -71,5 +73,30 @@ describe('DesignsPage', () => {
     renderPage()
     expect(await screen.findByText('Tidak dapat terhubung ke server')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Coba lagi' })).toBeInTheDocument()
+  })
+
+  it('navigates to edit and changes status through the API', async () => {
+    const user = userEvent.setup()
+    vi.mocked(designsApi.setActive).mockResolvedValue({ data: { id: design.id, isActive: false } })
+    const { client } = renderPage()
+    const invalidate = vi.spyOn(client, 'invalidateQueries')
+    await screen.findByText('Premium UI')
+    await user.click(screen.getByRole('button', { name: 'Edit Premium UI' }))
+    expect(screen.getByRole('heading', { name: 'Edit Design destination' })).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: 'Back' }))
+    await user.click(screen.getByRole('button', { name: 'Deactivate' }))
+    await waitFor(() => expect(designsApi.setActive).toHaveBeenCalledWith('design-a', false))
+    expect(await screen.findByText('Design berhasil dinonaktifkan.')).toBeInTheDocument()
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: designsQueryKey })
+  })
+
+  it('keeps the previous status visible and reports a status API error', async () => {
+    const user = userEvent.setup()
+    vi.mocked(designsApi.setActive).mockRejectedValue(new TypeError('offline'))
+    renderPage()
+    const table = await screen.findByRole('table', { name: 'Daftar desain' })
+    await user.click(within(table).getByRole('button', { name: 'Deactivate' }))
+    expect(await screen.findByText('Tidak dapat terhubung ke server')).toBeInTheDocument()
+    expect(within(table).getByText('Active')).toBeInTheDocument()
   })
 })

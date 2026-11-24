@@ -1,0 +1,11 @@
+.design-editor { display: grid; gap: 22px; width: min(100%, 780px); margin: 0 auto; padding: 26px; }
+.design-editor__heading h1 { margin: 0; color: var(--color-text-primary); font-size: 26px; }
+.design-editor__heading p { margin: 7px 0 0; color: var(--color-text-secondary); font-size: 14px; }
+.design-editor__form { display: grid; gap: 17px; }
+.design-editor__actions { display: flex; justify-content: space-between; gap: 10px; padding-top: 6px; }
+.design-editor__loading { margin: 0; color: var(--color-text-secondary); }
+@media (max-width: 640px) {
+  .design-editor { gap: 18px; padding: 20px var(--spacing-page-mobile); }
+  .design-editor__actions { flex-direction: column-reverse; }
+  .design-editor__actions > button { width: 100%; }
+}
