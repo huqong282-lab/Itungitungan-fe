@@ -1,0 +1,17 @@
+.settings-page { display: grid; gap: 22px; width: min(100%, 900px); margin: 0 auto; padding: 26px; }
+.settings-page__heading h1 { margin: 0; color: var(--color-text-primary); font-size: 26px; }
+.settings-page__heading p { margin: 7px 0 0; color: var(--color-text-secondary); font-size: 14px; }
+.settings-page__form { display: grid; gap: 16px; }
+.settings-page__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.settings-page__actions { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 4px 0 16px; }
+.settings-page__actions > div { display: grid; gap: 8px; }
+.settings-page__actions .ui-alert { max-width: 480px; }
+.settings-page__dirty { margin: 0; color: var(--color-warning); font-size: 13px; }
+.settings-page__loading { margin: 0; color: var(--color-text-secondary); }
+
+@media (max-width: 640px) {
+  .settings-page { gap: 18px; padding: 20px var(--spacing-page-mobile); }
+  .settings-page__grid { grid-template-columns: 1fr; }
+  .settings-page__actions { grid-template-columns: 1fr; }
+  .settings-page__actions > button { width: 100%; }
+}

@@ -5,6 +5,7 @@ import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import { AuthGuard } from './AuthGuard'
 
+
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
@@ -25,16 +26,16 @@ export const appRoutes: RouteObject[] = [
         path: 'projects/:projectId',
         element: <RoutePlaceholderPage title="Project Details" />,
       },
-      { path: 'features', element: <RoutePlaceholderPage title="Features" /> },
+      { path: 'features', element: <FeaturesPage /> },
       {
         path: 'features/new',
-        element: <RoutePlaceholderPage title="Create Feature" />,
+        element: <FeatureEditorPage mode="create" />,
       },
       {
         path: 'features/:featureId',
-        element: <RoutePlaceholderPage title="Feature Details" />,
+        element: <FeatureEditorPage mode="edit" />,
       },
-      { path: 'designs', element: <RoutePlaceholderPage title="Designs" /> },
+      { path: 'designs', element: <DesignsPage /> },
       {
         path: 'designs/new',
         element: <RoutePlaceholderPage title="Create Design" />,
@@ -72,7 +73,7 @@ export const appRoutes: RouteObject[] = [
         path: 'quotations/:quotationId',
         element: <RoutePlaceholderPage title="Quotation Details" />,
       },
-      { path: 'settings', element: <RoutePlaceholderPage title="Settings" /> },
+      { path: 'settings', element: <SettingsPage /> },
         ],
       },
     ],

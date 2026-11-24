@@ -6,6 +6,9 @@ import QueryProvider from './QueryProvider'
 import { appRoutes } from './router'
 import { queryClient } from '../lib/queryClient'
 import { currentUserQueryKey } from './AuthGuard'
+import { settingsQueryKey } from '../pages/SettingsPage'
+import { featuresQueryKey } from '../pages/FeaturesPage'
+import { designsQueryKey } from '../pages/DesignsPage'
 
 afterEach(() => {
   cleanup()
@@ -19,9 +22,9 @@ const routes = [
   ['/app/projects', 'Projects'],
   ['/app/projects/new', 'Create Project'],
   ['/app/projects/project-123', 'Project Details'],
-  ['/app/features', 'Features'],
+  ['/app/features', 'Feature List'],
   ['/app/features/new', 'Create Feature'],
-  ['/app/features/feature-123', 'Feature Details'],
+  ['/app/features/feature-123', 'Edit Feature'],
   ['/app/designs', 'Designs'],
   ['/app/designs/new', 'Create Design'],
   ['/app/designs/design-123', 'Design Details'],
@@ -52,7 +55,6 @@ describe('application routes', () => {
 
   it.each([
     ['/app/projects/project-123', 'project-123'],
-    ['/app/features/feature-123', 'feature-123'],
     ['/app/designs/design-123', 'design-123'],
     ['/app/hosting/hosting-123', 'hosting-123'],
     ['/app/maintenance/maintenance-123', 'maintenance-123'],
@@ -61,6 +63,12 @@ describe('application routes', () => {
     renderRoute(path)
 
     expect(screen.getByText(id)).toBeInTheDocument()
+  })
+
+  it('renders the feature editor route using its cached detail data', () => {
+    renderRoute('/app/features/feature-123')
+    expect(screen.getByRole('heading', { name: 'Edit Feature' })).toBeInTheDocument()
+    expect(screen.getByLabelText(/^Name/)).toHaveValue('Feature')
   })
 
   it('navigates between application routes', async () => {
