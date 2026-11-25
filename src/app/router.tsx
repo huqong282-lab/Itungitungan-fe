@@ -4,7 +4,11 @@ import RoutePlaceholderPage, { NotFoundPage } from '../pages/RoutePlaceholderPag
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import { AuthGuard } from './AuthGuard'
-
+import SettingsPage from '../pages/SettingsPage'
+import FeaturesPage from '../pages/FeaturesPage'
+import FeatureEditorPage from '../pages/FeatureEditorPage'
+import DesignsPage from '../pages/DesignsPage'
+import DesignEditorPage from '../pages/DesignEditorPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },

@@ -5,15 +5,18 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import QueryProvider from './QueryProvider'
 import { appRoutes } from './router'
 import { queryClient } from '../lib/queryClient'
-import { currentUserQueryKey } from './AuthGuard'
 import { settingsQueryKey } from '../pages/SettingsPage'
 import { featuresQueryKey } from '../pages/FeaturesPage'
 import { designsQueryKey } from '../pages/DesignsPage'
+import { authApi } from '../lib/api/auth'
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
   vi.unstubAllEnvs()
 })
+
+const currentUser = { data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' } }
 
 const routes = [
   ['/login', 'Masuk'],
@@ -41,16 +44,26 @@ const routes = [
 
 function renderRoute(path: string) {
   queryClient.clear()
-  queryClient.setQueryData(currentUserQueryKey, { data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com' } })
+  vi.spyOn(authApi, 'getCurrentUser').mockResolvedValue(currentUser)
+  queryClient.setQueryData(settingsQueryKey, { data: { developerRate: 75000, workingHoursPerDay: 8, buffer: 20, margin: 30, rush: 10, freeRevisionCount: 2, additionalRevisionPrice: 150000 } })
+  queryClient.setQueryData([...featuresQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
+  queryClient.setQueryData([...featuresQueryKey, 'detail', 'feature-123'], { data: { id: 'feature-123', name: 'Feature', description: null, category: null, baseEstimatedHours: 0, isActive: true, options: [] } })
+  queryClient.setQueryData([...designsQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
+  queryClient.setQueryData([...designsQueryKey, 'detail', 'design-123'], { data: { id: 'design-123', name: 'Starter Design', description: null, price: 0, isActive: true } })
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
   return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
 }
 
 describe('application routes', () => {
-  it.each(routes)('opens %s', (path, title) => {
+  it.each(routes)('opens %s', async (path, title) => {
     renderRoute(path)
 
-    expect(screen.getByRole('heading', { name: title })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: title })).toBeInTheDocument()
+  })
+
+  it.each(['/login', '/register'])('keeps %s public without checking a session', (path) => {
+    renderRoute(path)
+    expect(authApi.getCurrentUser).not.toHaveBeenCalled()
   })
 
   it.each([
@@ -58,21 +71,21 @@ describe('application routes', () => {
     ['/app/hosting/hosting-123', 'hosting-123'],
     ['/app/maintenance/maintenance-123', 'maintenance-123'],
     ['/app/quotations/quotation-123', 'quotation-123'],
-  ])('reads the route parameter for %s', (path, id) => {
+  ])('reads the route parameter for %s', async (path, id) => {
     renderRoute(path)
 
-    expect(screen.getByText(id)).toBeInTheDocument()
+    expect(await screen.findByText(id)).toBeInTheDocument()
   })
 
-  it('renders the feature editor route using its cached detail data', () => {
+  it('renders the feature editor route using its cached detail data', async () => {
     renderRoute('/app/features/feature-123')
-    expect(screen.getByRole('heading', { name: 'Edit Feature' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Edit Feature' })).toBeInTheDocument()
     expect(screen.getByLabelText(/^Name/)).toHaveValue('Feature')
   })
 
-  it('renders the design editor route using its cached detail data', () => {
+  it('renders the design editor route using its cached detail data', async () => {
     renderRoute('/app/designs/design-123')
-    expect(screen.getByRole('heading', { name: 'Edit Design' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Edit Design' })).toBeInTheDocument()
     expect(screen.getByLabelText(/^Name/)).toHaveValue('Starter Design')
   })
 
@@ -80,13 +93,17 @@ describe('application routes', () => {
     const user = userEvent.setup()
     renderRoute('/app')
 
+    await screen.findByRole('heading', { name: 'Dashboard' })
+
     await user.click(screen.getByRole('link', { name: 'Projects' }))
 
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
   })
 
-  it('renders the shared shell, all navigation, and the active route state', () => {
+  it('renders the shared shell, all navigation, and the active route state', async () => {
     renderRoute('/app/projects/project-123')
+
+    await screen.findByRole('heading', { name: 'Project Details' })
 
     expect(screen.getByRole('navigation', { name: 'Menu utama' })).toBeInTheDocument()
     expect(screen.getByRole('banner')).toBeInTheDocument()
@@ -101,6 +118,7 @@ describe('application routes', () => {
   it('opens the user menu and navigates to settings', async () => {
     const user = userEvent.setup()
     renderRoute('/app')
+    await screen.findByRole('heading', { name: 'Dashboard' })
     await user.click(screen.getByRole('button', { name: 'Menu pengguna, Pengguna' }))
 
     expect(screen.getByRole('menuitem', { name: 'Profil & pengaturan' })).toHaveAttribute('href', '/app/settings')
@@ -111,6 +129,7 @@ describe('application routes', () => {
   it('opens and closes the responsive navigation and supports desktop sidebar collapse', async () => {
     const user = userEvent.setup()
     renderRoute('/app')
+    await screen.findByRole('heading', { name: 'Dashboard' })
     const trigger = screen.getByRole('button', { name: 'Buka navigasi' })
     await user.click(trigger)
     expect(screen.getByRole('button', { name: 'Tutup navigasi' })).toBeInTheDocument()
@@ -136,7 +155,7 @@ describe('application routes', () => {
     await user.click(screen.getByRole('button', { name: 'Tutup navigasi' }))
     await user.click(trigger)
     await user.click(screen.getByRole('link', { name: 'Projects' }))
-    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Projects' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Buka navigasi' })).toHaveAttribute('aria-expanded', 'false')
 
     await user.click(screen.getByRole('button', { name: 'Ciutkan sidebar' }))
@@ -165,6 +184,7 @@ describe('application routes', () => {
 
   it('loads the interactive application shell preview in development', async () => {
     const user = userEvent.setup()
+    vi.spyOn(authApi, 'getCurrentUser').mockResolvedValue(currentUser)
     const router = createMemoryRouter(appRoutes, { initialEntries: ['/dev/app-shell'] })
     render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
     expect(await screen.findByRole('heading', { name: 'Preview Responsive Navigation' })).toBeInTheDocument()
@@ -175,6 +195,7 @@ describe('application routes', () => {
     expect(screen.getByRole('button', { name: 'Perluas sidebar' })).toBeInTheDocument()
     await user.click(screen.getByRole('link', { name: 'Projects' }))
     expect(router.state.location.pathname).toBe('/app/projects')
+    await screen.findByRole('heading', { name: 'Projects' })
     expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('aria-current', 'page')
   })
 

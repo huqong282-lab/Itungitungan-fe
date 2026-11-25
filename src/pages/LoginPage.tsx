@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Calculator, Eye, EyeOff, FileText, LockKeyhole, Mail, Server, Wallet } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -9,6 +9,7 @@ import { Alert, Button, FormField, Input, type InputProps } from '../components/
 import { ApiError, type ApiResponse } from '../lib/api/client'
 import { authApi, type AuthUser, type LoginRequest } from '../lib/api/auth'
 import { mapApplicationError } from '../lib/errors/errorMessages'
+import { currentUserQueryKey } from '../app/AuthGuard'
 import './LoginPage.css'
 
 export type LoginPreviewState = 'default' | 'validation' | 'loading' | 'invalid-credentials' | 'server-error' | 'network-error' | 'success'
@@ -58,11 +59,15 @@ function PasswordInput({ visible, onToggle, ...inputProps }: PasswordInputProps)
 
 export default function LoginPage({ previewState }: { previewState?: LoginPreviewState }) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [showPassword, setShowPassword] = useState(false)
   const [previewNotice, setPreviewNotice] = useState('')
   const mutation = useMutation<LoginResponse, unknown, LoginRequest>({
     mutationFn: (body) => authApi.login(body),
-    onSuccess: () => { void navigate('/app', { replace: true }) },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: currentUserQueryKey, exact: true })
+      void navigate('/app', { replace: true })
+    },
   })
   const { register, handleSubmit, setError, formState: { errors, isSubmitted } } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),

@@ -6,21 +6,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { authApi } from '../lib/api/auth'
 import LoginPage from './LoginPage'
 import LoginPreviewPage from './LoginPreviewPage'
+import { AuthGuard } from '../app/AuthGuard'
 
-vi.mock('../lib/api/auth', () => ({ authApi: { login: vi.fn() } }))
+vi.mock('../lib/api/auth', () => ({ authApi: { login: vi.fn(), getCurrentUser: vi.fn() } }))
 
 afterEach(() => cleanup())
-beforeEach(() => vi.mocked(authApi.login).mockReset())
+beforeEach(() => { vi.mocked(authApi.login).mockReset(); vi.mocked(authApi.getCurrentUser).mockReset() })
 
 function renderLogin(initialEntry = '/login') {
   const queryClient = new QueryClient({ mutationCache: new MutationCache({ onError: () => undefined }), defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
   const router = createMemoryRouter([
     { path: '/login', element: <LoginPage /> },
-    { path: '/app', element: <h1>Dashboard</h1> },
+    { path: '/app', element: <AuthGuard />, children: [{ index: true, element: <h1>Dashboard</h1> }] },
     { path: '/dev/login-preview', element: <LoginPreviewPage /> },
   ], { initialEntries: [initialEntry] })
   render(<QueryClientProvider client={queryClient}><RouterProvider router={router} /></QueryClientProvider>)
-  return { router }
+  return { router, queryClient }
 }
 
 async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
@@ -45,11 +46,13 @@ describe('LoginPage', () => {
   it('submits the backend payload and navigates only after successful login', async () => {
     const user = userEvent.setup()
     vi.mocked(authApi.login).mockResolvedValue({ data: { user: { id: 'user-1', email: 'rina@example.com' } } })
+    vi.mocked(authApi.getCurrentUser).mockResolvedValue({ data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' } })
     const { router } = renderLogin()
     await fillValidForm(user)
     await user.click(screen.getByRole('button', { name: 'Masuk' }))
     expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
     expect(authApi.login).toHaveBeenCalledWith({ email: 'rina@example.com', password: 'secret' })
+    expect(authApi.getCurrentUser).toHaveBeenCalledOnce()
     expect(router.state.location.pathname).toBe('/app')
     expect(router.state.historyAction).toBe('REPLACE')
   })
