@@ -42,11 +42,6 @@ const routes = [
 function renderRoute(path: string) {
   queryClient.clear()
   queryClient.setQueryData(currentUserQueryKey, { data: { id: 'user-1', name: 'Rina Anggraini', email: 'rina@example.com' } })
-  queryClient.setQueryData(settingsQueryKey, { data: { developerRate: 75000, workingHoursPerDay: 8, buffer: 20, margin: 30, rush: 10, freeRevisionCount: 2, additionalRevisionPrice: 150000 } })
-  queryClient.setQueryData([...featuresQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
-  queryClient.setQueryData([...featuresQueryKey, 'detail', 'feature-123'], { data: { id: 'feature-123', name: 'Feature', description: null, category: null, baseEstimatedHours: 0, isActive: true, options: [] } })
-  queryClient.setQueryData([...designsQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
-  queryClient.setQueryData([...designsQueryKey, 'detail', 'design-123'], { data: { id: 'design-123', name: 'Starter Design', description: null, price: 0, isActive: true } })
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
   return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
 }
