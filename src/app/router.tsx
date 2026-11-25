@@ -9,6 +9,7 @@ import FeaturesPage from '../pages/FeaturesPage'
 import FeatureEditorPage from '../pages/FeatureEditorPage'
 import DesignsPage from '../pages/DesignsPage'
 import DesignEditorPage from '../pages/DesignEditorPage'
+import HostingPage from '../pages/HostingPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
@@ -48,7 +49,7 @@ export const appRoutes: RouteObject[] = [
         path: 'designs/:designId',
         element: <DesignEditorPage mode="edit" />,
       },
-      { path: 'hosting', element: <RoutePlaceholderPage title="Hosting" /> },
+      { path: 'hosting', element: <HostingPage /> },
       {
         path: 'hosting/new',
         element: <RoutePlaceholderPage title="Create Hosting Plan" />,

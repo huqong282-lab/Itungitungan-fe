@@ -23,6 +23,7 @@ function renderAt(path: string, seedSession = false) {
         { path: 'features/:featureId/options/:optionId/values/:valueId', element: <h1>Feature Value Details</h1> },
         { path: 'designs', element: <h1>Design List</h1> },
         { path: 'designs/:designId', element: <h1>Design Details</h1> },
+        { path: 'hosting', element: <h1>Hosting List</h1> },
       ] }],
     },
   ], { initialEntries: [path] })
@@ -49,6 +50,7 @@ describe('AuthGuard', () => {
     ['/app/features/feature-1/options/option-1/values/value-1', 'Feature Value Details'],
     ['/app/designs', 'Design List'],
     ['/app/designs/design-1', 'Design Details'],
+    ['/app/hosting', 'Hosting List'],
   ])('protects nested route %s with a verified session', async (path, title) => {
     const getCurrentUser = vi.spyOn(authApi, 'getCurrentUser').mockResolvedValue(userResponse)
     const { router } = renderAt(path)

@@ -8,6 +8,7 @@ import { queryClient } from '../lib/queryClient'
 import { settingsQueryKey } from '../pages/SettingsPage'
 import { featuresQueryKey } from '../pages/FeaturesPage'
 import { designsQueryKey } from '../pages/DesignsPage'
+import { hostingQueryKey } from '../pages/HostingPage'
 import { authApi } from '../lib/api/auth'
 
 afterEach(() => {
@@ -31,7 +32,7 @@ const routes = [
   ['/app/designs', 'Designs'],
   ['/app/designs/new', 'Create Design'],
   ['/app/designs/design-123', 'Edit Design'],
-  ['/app/hosting', 'Hosting'],
+  ['/app/hosting', 'Hosting List'],
   ['/app/hosting/new', 'Create Hosting Plan'],
   ['/app/hosting/hosting-123', 'Hosting Plan Details'],
   ['/app/maintenance', 'Maintenance'],
@@ -49,6 +50,7 @@ function renderRoute(path: string) {
   queryClient.setQueryData([...featuresQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
   queryClient.setQueryData([...featuresQueryKey, 'detail', 'feature-123'], { data: { id: 'feature-123', name: 'Feature', description: null, category: null, baseEstimatedHours: 0, isActive: true, options: [] } })
   queryClient.setQueryData([...designsQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
+  queryClient.setQueryData([...hostingQueryKey, 'list', { page: 1, pageSize: 20 }], { data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } })
   queryClient.setQueryData([...designsQueryKey, 'detail', 'design-123'], { data: { id: 'design-123', name: 'Starter Design', description: null, price: 0, isActive: true } })
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
   return render(<QueryProvider><RouterProvider router={router} /></QueryProvider>)
