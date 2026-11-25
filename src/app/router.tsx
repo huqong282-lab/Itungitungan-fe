@@ -38,11 +38,11 @@ export const appRoutes: RouteObject[] = [
       { path: 'designs', element: <DesignsPage /> },
       {
         path: 'designs/new',
-        element: <RoutePlaceholderPage title="Create Design" />,
+        element: <DesignEditorPage mode="create" />,
       },
       {
         path: 'designs/:designId',
-        element: <RoutePlaceholderPage title="Design Details" />,
+        element: <DesignEditorPage mode="edit" />,
       },
       { path: 'hosting', element: <RoutePlaceholderPage title="Hosting" /> },
       {

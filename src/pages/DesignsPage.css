@@ -10,6 +10,7 @@
 .designs-page__name { display: grid; gap: 4px; min-width: 180px; }
 .designs-page__name strong { color: var(--color-text-primary); }
 .designs-page__name span { max-width: 500px; overflow: hidden; color: var(--color-text-secondary); text-overflow: ellipsis; white-space: nowrap; }
+.designs-page__row-actions { display: flex; align-items: center; gap: 6px; }
 .designs-page__pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .designs-page__loading { margin: 0; color: var(--color-text-secondary); }
 @media (max-width: 680px) {

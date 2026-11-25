@@ -27,7 +27,7 @@ const routes = [
   ['/app/features/feature-123', 'Edit Feature'],
   ['/app/designs', 'Designs'],
   ['/app/designs/new', 'Create Design'],
-  ['/app/designs/design-123', 'Design Details'],
+  ['/app/designs/design-123', 'Edit Design'],
   ['/app/hosting', 'Hosting'],
   ['/app/hosting/new', 'Create Hosting Plan'],
   ['/app/hosting/hosting-123', 'Hosting Plan Details'],
@@ -55,7 +55,6 @@ describe('application routes', () => {
 
   it.each([
     ['/app/projects/project-123', 'project-123'],
-    ['/app/designs/design-123', 'design-123'],
     ['/app/hosting/hosting-123', 'hosting-123'],
     ['/app/maintenance/maintenance-123', 'maintenance-123'],
     ['/app/quotations/quotation-123', 'quotation-123'],
@@ -69,6 +68,12 @@ describe('application routes', () => {
     renderRoute('/app/features/feature-123')
     expect(screen.getByRole('heading', { name: 'Edit Feature' })).toBeInTheDocument()
     expect(screen.getByLabelText(/^Name/)).toHaveValue('Feature')
+  })
+
+  it('renders the design editor route using its cached detail data', () => {
+    renderRoute('/app/designs/design-123')
+    expect(screen.getByRole('heading', { name: 'Edit Design' })).toBeInTheDocument()
+    expect(screen.getByLabelText(/^Name/)).toHaveValue('Starter Design')
   })
 
   it('navigates between application routes', async () => {
